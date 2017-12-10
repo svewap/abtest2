@@ -12,7 +12,7 @@
 
 $EM_CONF[$_EXTKEY] = array(
     'title' => 'AB Test Pages',
-    'description' => 'With this extension, administrators can deliver different content for the same URL (AB test), depending on cookies or parameters.',
+    'description' => 'With this extension, administrators can deliver different content for the same URL (AB test), depending on cookies or least showed page to realize a most accurate possible test.',
     'category' => 'misc',
     'author' => 'Sven Wappler',
     'author_email' => 'typo3YYYY@wappler.systems',

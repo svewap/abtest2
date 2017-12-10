@@ -9,6 +9,7 @@ namespace WapplerSystems\ABTest2;
  * LICENSE.txt file that was distributed with this source code.
  */
 
+use TYPO3\CMS\Core\Utility\DebugUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 use TYPO3\CMS\Frontend\Page\PageRepository;
@@ -21,27 +22,6 @@ use TYPO3\CMS\Frontend\Page\PageRepository;
  */
 class Helper
 {
-
-    /** @var int|null */
-    protected $currentPageId = null;
-
-    /** @var int|null */
-    protected $rootpage_id = null;
-
-    /** @var array */
-    protected $realurlConfig = null;
-
-    /** @var int|null */
-    protected $selectBSite = null;
-
-    /** @var int|null */
-    protected $cookieLifeTime = null;
-
-    /** @var int|null */
-    protected $randomAbPageId = null;
-
-    /** @var string */
-    protected $additionalHeaderData;
 
     /**
      *
@@ -56,20 +36,20 @@ class Helper
         // only try to change the page if it's not the googlebot.
         if (false === stripos($_SERVER['HTTP_USER_AGENT'], 'googlebot')) {
 
-            $this->currentPageId = $pObj->id;
+            $currentPageId = $randomPageId = $pObj->id;
 
             // Get the rootpage_id from realurl config.
-            $this->realurlConfig = $pObj->TYPO3_CONF_VARS['EXTCONF']['realurl'];
-            if (array_key_exists($_SERVER['SERVER_NAME'], $this->realurlConfig)) {
-                $this->rootpage_id = $this->realurlConfig[$_SERVER['SERVER_NAME']]['pagePath']['rootpage_id'];
+            $realurlConfig = $pObj->TYPO3_CONF_VARS['EXTCONF']['realurl'];
+            if (array_key_exists($_SERVER['SERVER_NAME'], $realurlConfig)) {
+                $rootpage_id = $realurlConfig[$_SERVER['SERVER_NAME']]['pagePath']['rootpage_id'];
             } else {
-                $this->rootpage_id = $this->realurlConfig['_DEFAULT']['pagePath']['rootpage_id'];
+                $rootpage_id = $realurlConfig['_DEFAULT']['pagePath']['rootpage_id'];
             }
 
             // If the ID is NULL, then we set this value to the rootpage_id. NULL is the "Home"page, ID is a specific sub-page, e.g. www.domain.de (NULL) - www.domain.de/page.html (ID)
-            if (!$this->currentPageId) {
-                if ($this->rootpage_id) {
-                    $this->currentPageId = $this->rootpage_id;
+            if (!$currentPageId) {
+                if ($rootpage_id) {
+                    $currentPageId = $rootpage_id;
                 } else {
                     // Leave the function because we can not determine the ID.
                     return;
@@ -77,37 +57,62 @@ class Helper
             }
 
             $pageRepository = GeneralUtility::makeInstance(PageRepository::class);
-            $currentPagePropertiesArray = $pageRepository->getPage($this->currentPageId);
+            $currentPagePropertiesArray = $pageRepository->getPage($currentPageId);
 
-            $this->selectBSite = $currentPagePropertiesArray['tx_abtest2_b_id'];
-            $this->cookieLifeTime = $currentPagePropertiesArray['tx_abtest2_cookie_time'];
+            $pageBPageId = $currentPagePropertiesArray['tx_abtest2_b_id'];
+            $cookieLifeTime = $currentPagePropertiesArray['tx_abtest2_cookie_time'];
 
-            if ($this->selectBSite) {
-                if ((int)$_COOKIE['abtest2-' . $this->currentPageId] > 0) {
-                    $this->randomAbPageId = (int)$_COOKIE['abtest2-' . $this->currentPageId];
+            if ($pageBPageId) {
+                /* page b id exists */
+                $cookiePageId = (int)$_COOKIE['abtest2-' . $currentPageId];
+
+                if ($cookiePageId > 0 && ($cookiePageId === $pageBPageId || $cookiePageId === $currentPageId)) {
+                    /* valid cookie page id -> select cookie page id */
+                    $randomPageId = $cookiePageId;
                 } else {
-                    $randomPage = rand(0, 1); // 0 = original ID; 1 = "B" site.
-                    if ($randomPage) {
-                        $this->randomAbPageId = $this->selectBSite;
+                    /* select least used page */
+                    $pageBPropertiesArray = $pageRepository->getPage($pageBPageId);
+                    if ((int)$currentPagePropertiesArray['tx_abtest2_counter'] > (int)$pageBPropertiesArray['tx_abtest2_counter']) {
+                        $randomPageId = $pageBPageId;
+                        $currentPagePropertiesArray = $pageBPropertiesArray;
+
+                    } elseif ((int)$currentPagePropertiesArray['tx_abtest2_counter'] < (int)$pageBPropertiesArray['tx_abtest2_counter']) {
+
                     } else {
-                        $this->randomAbPageId = $this->currentPageId;
+                        /* random */
+                        $randomPage = rand(0, 1); // 0 = original ID; 1 = "B" site.
+                        if ($randomPage) {
+                            $randomPageId = $pageBPageId;
+                            $currentPagePropertiesArray = $pageBPropertiesArray;
+                        }
                     }
-                    setcookie('abtest2-' . $this->currentPageId, $this->randomAbPageId, time() + $this->cookieLifeTime);
+
+                    /* rise counter */
+                    $GLOBALS['TYPO3_DB']->exec_UPDATEquery('pages', 'uid='. (int)$randomPageId, array('tx_abtest2_counter' => $currentPagePropertiesArray['tx_abtest2_counter'] + 1));
+
+                    setcookie('abtest2-' . $currentPageId, $randomPageId, time() + $cookieLifeTime);
                 }
 
                 // If current page ID is different from the random page ID we set the correct page ID.
-                if ($this->currentPageId !== $this->randomAbPageId) {
-                    $pObj->contentPid = $this->randomAbPageId;
-                    $GLOBALS['TSFE']->page['content_from_pid'] = $this->randomAbPageId;
-                    $GLOBALS['TSFE']->page['no_cache'] = true;
+                if ($currentPageId !== $randomPageId) {
+                    $pObj->contentPid = $randomPageId;
+                    $pObj->page['content_from_pid'] = $randomPageId;
                 }
-            }
 
-            // If additional headerdata is present then we specify additionalHeaderData.
-            $randomPagePropertiesArray = $pageRepository->getPage($this->randomAbPageId);
-            $this->additionalHeaderData = $randomPagePropertiesArray['tx_abtest2_header'];
-            if ($this->additionalHeaderData) {
-                $GLOBALS['TSFE']->additionalHeaderData['abtest2'] = $this->additionalHeaderData;
+                $pObj->page['no_cache'] = true;
+
+
+                if ($currentPagePropertiesArray) {
+                    $additionalHeaderData = $currentPagePropertiesArray['tx_abtest2_header'];
+                    $additionalFooterData = $currentPagePropertiesArray['tx_abtest2_footer'];
+                    if ($additionalHeaderData) {
+                        $pObj->additionalHeaderData['abtest2'] = $additionalHeaderData;
+                    }
+                    if ($additionalFooterData) {
+                        $pObj->additionalFooterData['abtest2'] = $additionalFooterData;
+                    }
+                }
+
             }
 
         }

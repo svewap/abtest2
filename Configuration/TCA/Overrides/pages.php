@@ -35,11 +35,18 @@
             'type' => 'text'
         )
     ),
+    'tx_abtest2_footer' => array(
+        'exclude' => 1,
+        'label' => 'LLL:EXT:abtest2/Resources/Private/Language/locallang_db.xlf:pages.tx_abtest2_footer',
+        'config' => array(
+            'type' => 'text'
+        )
+    ),
     'tx_abtest2_counter' => array(
         'exclude' => 1,
         'label' => 'LLL:EXT:abtest2/Resources/Private/Language/locallang_db.xlf:pages.tx_abtest2_counter',
         'config' => array(
-            'type' => 'text'
+            'type' => 'input'
         )
     )
 ));
