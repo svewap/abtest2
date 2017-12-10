@@ -28,7 +28,7 @@ class Helper
     /** @var int|null */
     protected $rootpage_id = null;
 
-    /** @var int|null */
+    /** @var array */
     protected $realurlConfig = null;
 
     /** @var int|null */
