@@ -64,16 +64,18 @@ class Helper
 
             if ($pageBPageId) {
 
+                $pageBPropertiesArray = $pageRepository->getPage($pageBPageId);
                 $cookieValue = $_COOKIE['abtest2'];
 
                 if ($cookieValue === 'b') {
                     $targetPageId = $pageBPageId;
+                    $currentPagePropertiesArray = $pageBPropertiesArray;
                 } else if ($cookieValue === 'a') {
 
                 } else {
                     $cookieValue = 'a';
                     /* select least used page */
-                    $pageBPropertiesArray = $pageRepository->getPage($pageBPageId);
+
                     if ((int)$currentPagePropertiesArray['tx_abtest2_counter'] > (int)$pageBPropertiesArray['tx_abtest2_counter']) {
                         /* take b */
                         $targetPageId = $pageBPageId;
