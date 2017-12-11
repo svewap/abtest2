@@ -35,7 +35,7 @@ class Helper
         // only try to change the page if it's not the googlebot.
         if (false === stripos($_SERVER['HTTP_USER_AGENT'], 'googlebot')) {
 
-            $currentPageId = $randomPageId = $pObj->id;
+            $currentPageId = $targetPageId = $pObj->id;
 
             // Get the rootpage_id from realurl config.
             $realurlConfig = $pObj->TYPO3_CONF_VARS['EXTCONF']['realurl'];
@@ -59,43 +59,38 @@ class Helper
             $currentPagePropertiesArray = $pageRepository->getPage($currentPageId);
 
             $pageBPageId = $currentPagePropertiesArray['tx_abtest2_b_id'];
+            /* TODO: check if page b exists */
             $cookieLifeTime = $currentPagePropertiesArray['tx_abtest2_cookie_time'];
 
             if ($pageBPageId) {
-                /* page b id exists */
-                $cookiePageId = (int)$_COOKIE['abtest2-' . $currentPageId];
 
-                if ($cookiePageId > 0 && ($cookiePageId === $pageBPageId || $cookiePageId === $currentPageId)) {
-                    /* valid cookie page id -> select cookie page id */
-                    $randomPageId = $cookiePageId;
+                $cookieValue = $_COOKIE['abtest2'];
+
+                if ($cookieValue === 'b') {
+                    $targetPageId = $pageBPageId;
+                } else if ($cookieValue === 'a') {
+
                 } else {
+                    $cookieValue = 'a';
                     /* select least used page */
                     $pageBPropertiesArray = $pageRepository->getPage($pageBPageId);
                     if ((int)$currentPagePropertiesArray['tx_abtest2_counter'] > (int)$pageBPropertiesArray['tx_abtest2_counter']) {
-                        $randomPageId = $pageBPageId;
+                        /* take b */
+                        $targetPageId = $pageBPageId;
                         $currentPagePropertiesArray = $pageBPropertiesArray;
-
-                    } elseif ((int)$currentPagePropertiesArray['tx_abtest2_counter'] < (int)$pageBPropertiesArray['tx_abtest2_counter']) {
-
-                    } else {
-                        /* random */
-                        $randomPage = rand(0, 1); // 0 = original ID; 1 = "B" site.
-                        if ($randomPage) {
-                            $randomPageId = $pageBPageId;
-                            $currentPagePropertiesArray = $pageBPropertiesArray;
-                        }
+                        $cookieValue = 'b';
                     }
 
                     /* rise counter */
-                    $GLOBALS['TYPO3_DB']->exec_UPDATEquery('pages', 'uid='. (int)$randomPageId, array('tx_abtest2_counter' => $currentPagePropertiesArray['tx_abtest2_counter'] + 1));
+                    $GLOBALS['TYPO3_DB']->exec_UPDATEquery('pages', 'uid='. (int)$targetPageId, array('tx_abtest2_counter' => $currentPagePropertiesArray['tx_abtest2_counter'] + 1));
 
-                    setcookie('abtest2-' . $currentPageId, $randomPageId, time() + $cookieLifeTime);
+                    setcookie('abtest2', $cookieValue, time() + $cookieLifeTime);
                 }
 
                 // If current page ID is different from the random page ID we set the correct page ID.
-                if ($currentPageId !== $randomPageId) {
-                    $pObj->contentPid = $randomPageId;
-                    $pObj->page['content_from_pid'] = $randomPageId;
+                if ($currentPageId !== $targetPageId) {
+                    $pObj->contentPid = $targetPageId;
+                    $pObj->page['content_from_pid'] = $targetPageId;
                 }
 
                 $pObj->page['no_cache'] = true;
