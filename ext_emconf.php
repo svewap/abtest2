@@ -10,7 +10,7 @@
  * writing. "version" and "dependencies" must not be touched!
  ***************************************************************/
 
-$EM_CONF[$_EXTKEY] = array(
+$EM_CONF[$_EXTKEY] = [
     'title' => 'AB Test Pages',
     'description' => 'With this extension, administrators can deliver different content for the same URL (AB test), depending on cookies or least showed page to realize a most accurate possible test.',
     'category' => 'misc',
@@ -23,16 +23,16 @@ $EM_CONF[$_EXTKEY] = array(
     'clearCacheOnLoad' => true,
     'version' => '0.1.0',
     'constraints' =>
-        array(
+        [
             'depends' =>
-                array(
+                [
                     'typo3' => '7.6.0-8.7.99',
                     'realurl' => '2.0.0-0.0.0',
-                ),
+                ],
             'conflicts' =>
-                array(),
+                [],
             'suggests' =>
-                array(),
-        ),
-);
+                [],
+        ],
+];
 
