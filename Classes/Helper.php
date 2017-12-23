@@ -11,6 +11,7 @@ namespace WapplerSystems\ABTest2;
 
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
+use TYPO3\CMS\Frontend\Page\CacheHashCalculator;
 use TYPO3\CMS\Frontend\Page\PageRepository;
 
 /**
@@ -25,93 +26,116 @@ class Helper
     /**
      *
      * @param array $params
-     * @param $pObj TypoScriptFrontendController
+     * @param $tsFeController TypoScriptFrontendController
      * @return void
      * @throws \InvalidArgumentException
      */
-    public function determineContentId(array $params, &$pObj)
+    public function determineContentId(array $params, &$tsFeController)
     {
 
         // only try to change the page if it's not the googlebot.
-        if (false === stripos($_SERVER['HTTP_USER_AGENT'], 'googlebot')) {
+        if (true === stripos($_SERVER['HTTP_USER_AGENT'], 'googlebot')) return;
 
-            $currentPageId = $targetPageId = $pObj->id;
+        $currentPageId = $targetPageId = $tsFeController->id;
 
-            // Get the rootpage_id from realurl config.
-            $realurlConfig = $pObj->TYPO3_CONF_VARS['EXTCONF']['realurl'];
-            if (array_key_exists($_SERVER['SERVER_NAME'], $realurlConfig)) {
-                $rootpage_id = $realurlConfig[$_SERVER['SERVER_NAME']]['pagePath']['rootpage_id'];
+        // Get the rootpage_id from realurl config.
+        $realurlConfig = $tsFeController->TYPO3_CONF_VARS['EXTCONF']['realurl'];
+        if (array_key_exists($_SERVER['SERVER_NAME'], $realurlConfig)) {
+            $rootpage_id = $realurlConfig[$_SERVER['SERVER_NAME']]['pagePath']['rootpage_id'];
+        } else {
+            $rootpage_id = $realurlConfig['_DEFAULT']['pagePath']['rootpage_id'];
+        }
+
+        // If the ID is NULL, then we set this value to the rootpage_id. NULL is the "Home"page, ID is a specific sub-page, e.g. www.domain.de (NULL) - www.domain.de/page.html (ID)
+        if (!$currentPageId) {
+            if ($rootpage_id) {
+                $currentPageId = $rootpage_id;
             } else {
-                $rootpage_id = $realurlConfig['_DEFAULT']['pagePath']['rootpage_id'];
+                // Leave the function because we can not determine the ID.
+                return;
             }
+        }
 
-            // If the ID is NULL, then we set this value to the rootpage_id. NULL is the "Home"page, ID is a specific sub-page, e.g. www.domain.de (NULL) - www.domain.de/page.html (ID)
-            if (!$currentPageId) {
-                if ($rootpage_id) {
-                    $currentPageId = $rootpage_id;
-                } else {
-                    // Leave the function because we can not determine the ID.
-                    return;
-                }
-            }
+        $pageRepository = GeneralUtility::makeInstance(PageRepository::class);
+        $currentPagePropertiesArray = $pageRepository->getPage($currentPageId);
 
-            $pageRepository = GeneralUtility::makeInstance(PageRepository::class);
-            $currentPagePropertiesArray = $pageRepository->getPage($currentPageId);
+        $pageBPageId = $currentPagePropertiesArray['tx_abtest2_b_id'];
+        /* TODO: check if page b exists */
+        $cookieLifeTime = $currentPagePropertiesArray['tx_abtest2_cookie_time'];
 
-            $pageBPageId = $currentPagePropertiesArray['tx_abtest2_b_id'];
-            /* TODO: check if page b exists */
-            $cookieLifeTime = $currentPagePropertiesArray['tx_abtest2_cookie_time'];
+        if ($pageBPageId) {
 
-            if ($pageBPageId) {
+            $pageBPropertiesArray = $pageRepository->getPage($pageBPageId);
+            $cookieValue = $_COOKIE['abtest2'];
 
-                $pageBPropertiesArray = $pageRepository->getPage($pageBPageId);
-                $cookieValue = $_COOKIE['abtest2'];
+            if ($cookieValue === 'b') {
+                $targetPageId = $pageBPageId;
+                $currentPagePropertiesArray = $pageBPropertiesArray;
+            } else if ($cookieValue === 'a') {
 
-                if ($cookieValue === 'b') {
+            } else {
+                $cookieValue = 'a';
+                /* select least used page */
+
+                if ((int)$currentPagePropertiesArray['tx_abtest2_counter'] > (int)$pageBPropertiesArray['tx_abtest2_counter']) {
+                    /* take b */
                     $targetPageId = $pageBPageId;
                     $currentPagePropertiesArray = $pageBPropertiesArray;
-                } else if ($cookieValue === 'a') {
-
-                } else {
-                    $cookieValue = 'a';
-                    /* select least used page */
-
-                    if ((int)$currentPagePropertiesArray['tx_abtest2_counter'] > (int)$pageBPropertiesArray['tx_abtest2_counter']) {
-                        /* take b */
-                        $targetPageId = $pageBPageId;
-                        $currentPagePropertiesArray = $pageBPropertiesArray;
-                        $cookieValue = 'b';
-                    }
-
-                    /* rise counter */
-                    $GLOBALS['TYPO3_DB']->exec_UPDATEquery('pages', 'uid='. (int)$targetPageId, array('tx_abtest2_counter' => $currentPagePropertiesArray['tx_abtest2_counter'] + 1));
-
-                    setcookie('abtest2', $cookieValue, time() + $cookieLifeTime);
+                    $cookieValue = 'b';
                 }
 
-                // If current page ID is different from the random page ID we set the correct page ID.
-                if ($currentPageId !== $targetPageId) {
-                    $pObj->contentPid = $targetPageId;
-                    $pObj->page['content_from_pid'] = $targetPageId;
+                /* rise counter */
+                $GLOBALS['TYPO3_DB']->exec_UPDATEquery('pages', 'uid='. (int)$targetPageId, array('tx_abtest2_counter' => $currentPagePropertiesArray['tx_abtest2_counter'] + 1));
+
+                setcookie('abtest2', $cookieValue, time() + $cookieLifeTime);
+            }
+
+            // If current page ID is different from the random page ID we set the correct page ID.
+            if ($currentPageId !== $targetPageId) {
+                $tsFeController->contentPid = $targetPageId;
+                $tsFeController->page['content_from_pid'] = $targetPageId;
+            }
+
+            //$pObj->page['no_cache'] = true;
+
+            $_GET['abtest'] = $cookieValue;
+
+            $this->makeCacheHash($tsFeController);
+
+
+            if ($currentPagePropertiesArray) {
+                $additionalHeaderData = $currentPagePropertiesArray['tx_abtest2_header'];
+                $additionalFooterData = $currentPagePropertiesArray['tx_abtest2_footer'];
+                if ($additionalHeaderData) {
+                    $tsFeController->additionalHeaderData['abtest2'] = $additionalHeaderData;
                 }
-
-                $pObj->page['no_cache'] = true;
-
-
-                if ($currentPagePropertiesArray) {
-                    $additionalHeaderData = $currentPagePropertiesArray['tx_abtest2_header'];
-                    $additionalFooterData = $currentPagePropertiesArray['tx_abtest2_footer'];
-                    if ($additionalHeaderData) {
-                        $pObj->additionalHeaderData['abtest2'] = $additionalHeaderData;
-                    }
-                    if ($additionalFooterData) {
-                        $pObj->additionalFooterData['abtest2'] = $additionalFooterData;
-                    }
+                if ($additionalFooterData) {
+                    $tsFeController->additionalFooterData['abtest2'] = $additionalFooterData;
                 }
-
             }
 
         }
+
+
+
+    }
+
+
+    /**
+     *
+     * @param $tsFeController TypoScriptFrontendController
+     * @return void
+     * @throws \InvalidArgumentException
+     */
+    private function makeCacheHash(&$tsFeController)
+    {
+        $GET = GeneralUtility::_GET();
+
+        /** @var CacheHashCalculator $cacheHash */
+        $cacheHash = GeneralUtility::makeInstance(CacheHashCalculator::class);
+
+        $tsFeController->cHash_array = $cacheHash->getRelevantParameters(GeneralUtility::implodeArrayForUrl('', $GET));
+        $tsFeController->cHash = $cacheHash->calculateCacheHash($tsFeController->cHash_array);
 
     }
 }
