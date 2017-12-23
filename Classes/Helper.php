@@ -96,8 +96,6 @@ class Helper
                 $tsFeController->page['content_from_pid'] = $targetPageId;
             }
 
-            //$pObj->page['no_cache'] = true;
-
             $_GET['abtest'] = $cookieValue;
 
             $this->makeCacheHash($tsFeController);
@@ -130,6 +128,11 @@ class Helper
     private function makeCacheHash(&$tsFeController)
     {
         $GET = GeneralUtility::_GET();
+
+        /* Fix for root pages */
+        if (!isset($GET['id'])) {
+            $GET['id'] = $tsFeController->id;
+        }
 
         /** @var CacheHashCalculator $cacheHash */
         $cacheHash = GeneralUtility::makeInstance(CacheHashCalculator::class);
