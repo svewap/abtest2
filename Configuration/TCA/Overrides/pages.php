@@ -56,6 +56,6 @@
     'after:subtitle');
 
 $GLOBALS['TCA']['pages']['palettes']['tx_abtest2'] = array(
-    'showitem' => 'tx_abtest2_b_id,--linebreak--,tx_abtest2_header,tx_abtest2_cookie_time,tx_abtest2_counter'
+    'showitem' => 'tx_abtest2_b_id,--linebreak--,tx_abtest2_header,tx_abtest2_footer,tx_abtest2_cookie_time,tx_abtest2_counter'
 );
 
