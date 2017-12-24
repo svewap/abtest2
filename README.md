@@ -25,3 +25,6 @@ ga('send', 'pageview', { 'dimension1':  'Variant B' });
 ```
 (dimension1 is the index of your dimension)
 
+#### Demo
+
+![Demo](https://github.com/svewap/abtest2/raw/master/Resources/Public/Images/Demo/demo.gif)
