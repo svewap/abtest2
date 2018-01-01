@@ -13,6 +13,8 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 use TYPO3\CMS\Frontend\Page\CacheHashCalculator;
 use TYPO3\CMS\Frontend\Page\PageRepository;
+use WapplerSystems\ABTest2\DeviceDetector\DeviceDetector;
+use WapplerSystems\ABTest2\DeviceDetector\Yaml\Parser;
 
 /**
  * This class detects which page version (either by cookie or by random) and sets the page content ID accordingly.
@@ -32,9 +34,14 @@ class Helper
      */
     public function determineContentId(array $params, &$tsFeController)
     {
-
-        // only try to change the page if it's not the googlebot.
-        if (true === stripos($_SERVER['HTTP_USER_AGENT'], 'googlebot')) return;
+        $deviceDetector = new DeviceDetector();
+        $deviceDetector->setUserAgent($_SERVER['HTTP_USER_AGENT']);
+        try {
+            $deviceDetector->setYamlParser(new Parser());
+            $deviceDetector->parse();
+            if ($deviceDetector->isBot()) return;
+        } catch (\Exception $e) {
+        }
 
         $currentPageId = $targetPageId = $tsFeController->id;
 
