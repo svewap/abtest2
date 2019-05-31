@@ -47,7 +47,7 @@ class Helper
 
         // Get the rootpage_id from realurl config.
         $realurlConfig = $tsFeController->TYPO3_CONF_VARS['EXTCONF']['realurl'];
-        if (array_key_exists($_SERVER['SERVER_NAME'], $realurlConfig)) {
+        if (is_array($realurlConfig) && array_key_exists($_SERVER['SERVER_NAME'], $realurlConfig)) {
             $rootpage_id = $realurlConfig[$_SERVER['SERVER_NAME']]['pagePath']['rootpage_id'];
         } else {
             $rootpage_id = $realurlConfig['_DEFAULT']['pagePath']['rootpage_id'];
