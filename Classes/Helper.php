@@ -45,13 +45,9 @@ class Helper
 
         $currentPageId = $targetPageId = $tsFeController->id;
 
-        // Get the rootpage_id from realurl config.
-        $realurlConfig = $tsFeController->TYPO3_CONF_VARS['EXTCONF']['realurl'];
-        if (is_array($realurlConfig) && array_key_exists($_SERVER['SERVER_NAME'], $realurlConfig)) {
-            $rootpage_id = $realurlConfig[$_SERVER['SERVER_NAME']]['pagePath']['rootpage_id'];
-        } else {
-            $rootpage_id = $realurlConfig['_DEFAULT']['pagePath']['rootpage_id'];
-        }
+        // Get the rootpage_id
+        $pageRepository = GeneralUtility::makeInstance(PageRepository::class);
+        $rootpage_id = array_pop($pageRepository->getRootLine($GLOBALS['TSFE']->id));
 
         // If the ID is NULL, then we set this value to the rootpage_id. NULL is the "Home"page, ID is a specific sub-page, e.g. www.domain.de (NULL) - www.domain.de/page.html (ID)
         if (!$currentPageId) {
@@ -63,7 +59,6 @@ class Helper
             }
         }
 
-        $pageRepository = GeneralUtility::makeInstance(PageRepository::class);
         $currentPagePropertiesArray = $pageRepository->getPage($currentPageId);
 
         $pageBPageId = $currentPagePropertiesArray['tx_abtest2_b_id'];
