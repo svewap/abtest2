@@ -9,7 +9,8 @@
             'internal_type' => 'db',
             'allowed' => 'pages',
             'maxitems' => 1,
-            'size' => 1
+            'size' => 1,
+            'default' => 0
         ]
     ],
     'tx_abtest2_cookie_time' => [
