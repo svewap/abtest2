@@ -9,6 +9,7 @@ namespace WapplerSystems\ABTest2;
  * LICENSE.txt file that was distributed with this source code.
  */
 
+use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 use TYPO3\CMS\Frontend\Page\CacheHashCalculator;
@@ -44,10 +45,23 @@ class Helper
         }
 
         $currentPageId = $targetPageId = $tsFeController->id;
-
-        // Get the rootpage_id
+        /** @var PageRepository $pageRepository */
         $pageRepository = GeneralUtility::makeInstance(PageRepository::class);
-        $rootpage_id = array_pop($pageRepository->getRootLine($GLOBALS['TSFE']->id));
+
+        // Get the rootpage_id from realurl config.
+        if (ExtensionManagementUtility::isLoaded('realurl')) {
+            $realurlConfig = $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['realurl'];
+
+            if (is_array($realurlConfig) && array_key_exists($_SERVER['SERVER_NAME'], $realurlConfig)) {
+                $rootpage_id = $realurlConfig[$_SERVER['SERVER_NAME']]['pagePath']['rootpage_id'];
+            } else {
+                $rootpage_id = $realurlConfig['_DEFAULT']['pagePath']['rootpage_id'];
+            }
+        } else {
+            $rootline = $pageRepository->getRootLine($GLOBALS['TSFE']->id);
+
+            $rootpage_id = array_pop($rootline);
+        }
 
         // If the ID is NULL, then we set this value to the rootpage_id. NULL is the "Home"page, ID is a specific sub-page, e.g. www.domain.de (NULL) - www.domain.de/page.html (ID)
         if (!$currentPageId) {
