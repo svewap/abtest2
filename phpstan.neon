@@ -1,0 +1,9 @@
+parameters:
+  level: max
+  paths:
+    - Classes
+    - Configuration
+    - Tests
+  checkMissingIterableValueType: false
+  reportUnmatchedIgnoredErrors: false
+  checkGenericClassInNonGenericObjectType: false

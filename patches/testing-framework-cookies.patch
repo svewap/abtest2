@@ -1,0 +1,19 @@
+See: https://github.com/TYPO3/testing-framework/issues/36
+
+diff --git a/Classes/Core/Functional/Framework/Frontend/RequestBootstrap.php b/Classes/Core/Functional/Framework/Frontend/RequestBootstrap.php
+index f8b2a40..4f4020d 100644
+--- a/Classes/Core/Functional/Framework/Frontend/RequestBootstrap.php
++++ b/Classes/Core/Functional/Framework/Frontend/RequestBootstrap.php
+@@ -106,6 +106,12 @@ class RequestBootstrap
+         }
+         // Populating $_COOKIE
+         $_COOKIE = [];
++        if ($this->request->hasHeader('Cookie')) {
++            foreach ($this->request->getHeader('Cookie') as $cookie) {
++                [$cookieName, $cookieValue] = explode('=', $cookie, 2);
++                $_COOKIE[$cookieName] = rtrim($cookieValue, ';');
++            }
++        }
+ 
+         // Setting up the server environment
+         $_SERVER = [];

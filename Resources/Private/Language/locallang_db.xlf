@@ -1,45 +1,38 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
-<xliff version="1.0">
-	<file source-language="en" datatype="plaintext" original="messages" date="2017-10-20T11:36:00Z"
-		  product-name="abtest2">
-		<header/>
-		<body>
-			<trans-unit id="pages.tx_abtest2_b_id">
-				<source>Site B</source>
-			</trans-unit>
-			<trans-unit id="pages.tx_abtest2_cookie_time">
-				<source>Cookie Lifetime</source>
-			</trans-unit>
-			<trans-unit id="pages.tx_abtest2_header">
-				<source>Additional header information</source>
-			</trans-unit>
-			<trans-unit id="pages.tx_abtest2_footer">
-				<source>Additional footer information</source>
-			</trans-unit>
-			<trans-unit id="pages.tx_abtest2_counter">
-				<source>Counter</source>
-			</trans-unit>
-			<trans-unit id="palette_title">
-				<source>AB Test Settings</source>
-			</trans-unit>
-			<trans-unit id="cookie_1_month">
-				<source>1 month</source>
-			</trans-unit>
-			<trans-unit id="cookie_1_week">
-				<source>1 week</source>
-			</trans-unit>
-			<trans-unit id="cookie_1_day">
-				<source>1 day</source>
-			</trans-unit>
-			<trans-unit id="cookie_12_day">
-				<source>1/2 day</source>
-			</trans-unit>
-			<trans-unit id="cookie_1_hour">
-				<source>1 hour</source>
-			</trans-unit>
-			<trans-unit id="cookie_1_minute">
-				<source>1 minute</source>
-			</trans-unit>
-		</body>
-	</file>
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+    <file source-language="en" datatype="plaintext" original="messages" date="2023-03-02T09:19:28Z" product-name="abtest">
+        <header/>
+        <body>
+            <trans-unit id="pages.div_title" approved="yes">
+                <source>A/B Testing</source>
+            </trans-unit>
+            <trans-unit id="pages.tx_abtest_variant" approved="yes">
+                <source>Variant</source>
+            </trans-unit>
+            <trans-unit id="pages.tx_abtest_cookie_time" approved="yes">
+                <source>Cookie Lifetime</source>
+            </trans-unit>
+            <trans-unit id="pages.tx_abtest_cookie_time.cookie_1_month" approved="yes">
+                <source>1 month</source>
+            </trans-unit>
+            <trans-unit id="pages.tx_abtest_cookie_time.cookie_1_week" approved="yes">
+                <source>1 week</source>
+            </trans-unit>
+            <trans-unit id="pages.tx_abtest_cookie_time.cookie_1_day" approved="yes">
+                <source>1 day</source>
+            </trans-unit>
+            <trans-unit id="pages.tx_abtest_cookie_time.cookie_12_days" approved="yes">
+                <source>1/2 day</source>
+            </trans-unit>
+            <trans-unit id="pages.tx_abtest_cookie_time.cookie_1_hour" approved="yes">
+                <source>1 hour</source>
+            </trans-unit>
+            <trans-unit id="pages.tx_abtest_cookie_time.cookie_1_minute" approved="yes">
+                <source>1 minute</source>
+            </trans-unit>
+            <trans-unit id="pages.tx_abtest_counter" approved="yes">
+                <source>Counter</source>
+            </trans-unit>
+        </body>
+    </file>
 </xliff>

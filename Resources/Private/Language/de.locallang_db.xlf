@@ -1,57 +1,48 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
-<xliff version="1.0">
-	<file source-language="en" target-language="de" datatype="plaintext" original="messages" date="2017-10-20T11:36:00Z"
-		  product-name="abtest2">
-		<header/>
-		<body>
-			<trans-unit id="pages.tx_abtest2_b_id">
-				<source>Site B</source>
-				<target>Seite B</target>
-			</trans-unit>
-			<trans-unit id="pages.tx_abtest2_cookie_time">
-				<source>Cookie Lifetime</source>
-				<target>Cookie Lebenszeit</target>
-			</trans-unit>
-			<trans-unit id="pages.tx_abtest2_header">
-				<source>Additional Header Information</source>
-				<target>Zusätzliche Header Informationen</target>
-			</trans-unit>
-			<trans-unit id="pages.tx_abtest2_footer">
-				<source>Additional footer information</source>
-				<target>Zusätzliche Footer Informationen</target>
-			</trans-unit>
-			<trans-unit id="pages.tx_abtest2_counter">
-				<source>Counter</source>
-				<target>Zähler</target>
-			</trans-unit>
-			<trans-unit id="palette_title">
-				<source>AB Test Settings</source>
-				<target>AB Test Einstellungen</target>
-			</trans-unit>
-			<trans-unit id="cookie_1_month">
-				<source>1 month</source>
-				<target>1 Monat</target>
-			</trans-unit>
-			<trans-unit id="cookie_1_week">
-				<source>1 week</source>
-				<target>1 Woche</target>
-			</trans-unit>
-			<trans-unit id="cookie_1_day">
-				<source>1 day</source>
-				<target>1 Tag</target>
-			</trans-unit>
-			<trans-unit id="cookie_12_day">
-				<source>1/2 day</source>
-				<target>1/2 Tag</target>
-			</trans-unit>
-			<trans-unit id="cookie_1_hour">
-				<source>1 hour</source>
-				<target>1 Stunde</target>
-			</trans-unit>
-			<trans-unit id="cookie_1_minute">
-				<source>1 minute</source>
-				<target>1 Minute</target>
-			</trans-unit>
-		</body>
-	</file>
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+    <file target-language="de" source-language="en" datatype="plaintext" original="messages" date="2023-03-02T09:26:47Z" product-name="abtest">
+        <header/>
+        <body>
+            <trans-unit id="pages.div_title" approved="yes">
+                <source>A/B Testing</source>
+                <target>A/B Testing</target>
+            </trans-unit>
+            <trans-unit id="pages.tx_abtest_variant" approved="yes">
+                <source>Variant</source>
+                <target>Variante</target>
+            </trans-unit>
+            <trans-unit id="pages.tx_abtest_cookie_time" approved="yes">
+                <source>Cookie Lifetime</source>
+                <target>Cookie Lebenszeit</target>
+            </trans-unit>
+            <trans-unit id="pages.tx_abtest_cookie_time.cookie_1_month" approved="yes">
+                <source>1 month</source>
+                <target>1 Monat</target>
+            </trans-unit>
+            <trans-unit id="pages.tx_abtest_cookie_time.cookie_1_week" approved="yes">
+                <source>1 week</source>
+                <target>1 Woche</target>
+            </trans-unit>
+            <trans-unit id="pages.tx_abtest_cookie_time.cookie_1_day" approved="yes">
+                <source>1 day</source>
+                <target>1 Tag</target>
+            </trans-unit>
+            <trans-unit id="pages.tx_abtest_cookie_time.cookie_12_days" approved="yes">
+                <source>1/2 day</source>
+                <target>1/2 Tag</target>
+            </trans-unit>
+            <trans-unit id="pages.tx_abtest_cookie_time.cookie_1_hour" approved="yes">
+                <source>1 hour</source>
+                <target>1 Stunde</target>
+            </trans-unit>
+            <trans-unit id="pages.tx_abtest_cookie_time.cookie_1_minute" approved="yes">
+                <source>1 minute</source>
+                <target>1 Minute</target>
+            </trans-unit>
+            <trans-unit id="pages.tx_abtest_counter" approved="yes">
+                <source>Counter</source>
+                <target>Zähler</target>
+            </trans-unit>
+        </body>
+    </file>
 </xliff>

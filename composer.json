@@ -1,14 +1,77 @@
 {
-    "name": "svewap/abtest2",
+    "name": "werkraummedia/abtest",
     "type": "typo3-cms-extension",
-    "description": "",
-    "authors": [],
+    "license": "GPL-2.0-or-later",
+    "description": "Provides A/B Testing for TYPO3.",
+    "homepage": "https://github.com/werkraum-media/abtest",
+    "support": {
+        "docs": "https://docs.typo3.org/p/werkraummedia/abtest/master/en-us/",
+        "email": "coding@daniel-siepmann.de",
+        "issues": "https://github.com/werkraum-media/abtest/issues",
+        "source": "https://github.com/werkraum-media/abtest"
+    },
+    "authors": [
+        {
+            "name": "Sven Wappler",
+            "email": "typo3YYYY@wappler.systems",
+            "homepage": "https://wappler.systems/",
+            "role": "Developer"
+        },
+        {
+            "name": "Daniel Siepmann",
+            "email": "coding@daniel-siepmann.de",
+            "homepage": "https://daniel-siepmann.de/",
+            "role": "Developer"
+        }
+    ],
     "require": {
-        "typo3/cms-core": "^8.7.1"
+        "php": "~7.4.0 || ~8.1.0 || ~8.1.0 || ~8.2.0",
+        "typo3/cms-core": "^11.5",
+        "typo3/cms-frontend": "^11.5",
+        "matomo/device-detector": "^6.1",
+        "symfony/http-foundation": "^5.4",
+        "psr/http-message": "^1.0"
+    },
+    "require-dev": {
+        "phpstan/phpstan": "^1.10",
+        "typo3/testing-framework": "^6.16",
+        "phpunit/phpunit": "^9.6",
+        "friendsofphp/php-cs-fixer": "^3.14",
+        "cweagans/composer-patches": "^1.7"
     },
     "autoload": {
         "psr-4": {
-            "WapplerSystems\\ABTest2\\": "Classes"
+            "WerkraumMedia\\ABTest\\": "Classes/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "WerkraumMedia\\ABTest\\Tests\\": "Tests/"
+        }
+    },
+    "extra": {
+        "typo3/cms": {
+            "cms-package-dir": "{$vendor-dir}/typo3/cms",
+            "extension-key": "abtest",
+            "web-dir": ".Build/web"
+        },
+        "patches": {
+            "typo3/testing-framework": {
+                "Allow to test requests with cookies": "patches/testing-framework-cookies.patch"
+            }
+        }
+    },
+    "scripts": {
+        "post-autoload-dump": [
+            "@php -r 'is_dir($extFolder=__DIR__.\"/.Build/web/typo3conf/ext/\") || mkdir($extFolder, 0777, true);'",
+            "@php -r 'file_exists($extFolder=__DIR__.\"/.Build/web/typo3conf/ext/abtest\") || symlink(__DIR__,$extFolder);'"
+        ]
+    },
+    "config": {
+        "allow-plugins": {
+            "typo3/class-alias-loader": true,
+            "typo3/cms-composer-installers": true,
+            "cweagans/composer-patches": true
         }
     }
 }

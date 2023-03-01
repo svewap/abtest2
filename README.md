@@ -1,4 +1,4 @@
-# abtest2 TYPO3 Extension
+# abtest TYPO3 Extension
 
 Extension for A/B-Tests
 
@@ -19,60 +19,5 @@ Additional header information may be specified both for the original version as 
 
 #### Demo
 
-![Demo](https://raw.githubusercontent.com/svewap/abtest2/master/Documentation/Images/demo.gif)
-
-#### Example for Google Tag Manager:
-
-You have two options to define the parameter: By page settings or by TypoScript:
-
-##### Additional Header Information at page settings
-
-On original page (version A):
-
-```javascript
-<script>
-dataLayer.push({'variant': 'a'});
-</script>
-```
-
-On version B:
-
-```javascript
-<script>
-dataLayer.push({'variant': 'b'});
-</script>
-```
-
-
-##### TypoScript
-
-```typo3_typoscript
-[globalVar = GP:abtest = a]
-  page.headerData.129 = TEXT
-  page.headerData.129.value (
-<script>
-  dataLayer = [{
-    'variant': 'a'
-  }];
-</script>
-  )
-[global]
-[globalVar = GP:abtest = b]
-  page.headerData.129 = TEXT
-  page.headerData.129.value (
-<script>
-  dataLayer = [{
-    'variant': 'b'
-  }];
-</script>
-  )
-[global]
-
-page.headerData.130 = TEXT
-page.headerData.130.value (
-<!-- Google Tag Manager -->
-....
-<!-- End Google Tag Manager -->
-)
-```
+![Demo](https://raw.githubusercontent.com/werkraum-media/abtest/master/Documentation/Images/demo.gif)
 

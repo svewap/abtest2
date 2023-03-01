@@ -1,0 +1,16 @@
+config {
+    debug = 1
+}
+
+page = PAGE
+page {
+    config {
+        debug = 1
+    }
+
+    5 = TEXT
+    5.field = title
+
+    10 = TEXT
+    10.value = Example content from TypoScript
+}

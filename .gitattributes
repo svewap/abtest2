@@ -1,0 +1,13 @@
+Tests export-ignore
+patches export-ignore
+.github export-ignore
+
+.gitattributes export-ignore
+.gitignore export-ignore
+
+rector export-ignore
+.php-cs-fixer.dist.php export-ignore
+phpstan.neon export-ignore
+phpunit.xml.dist export-ignore
+
+shell.nix export-ignore
